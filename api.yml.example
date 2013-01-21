@@ -1,0 +1,5 @@
+google:
+ client_id: "Client Id from the API console goes here"
+ client_secret: "Client secret from API Console goes here"
+ auth_code: "Oath code"
+ application_name: "Application name"

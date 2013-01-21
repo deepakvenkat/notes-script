@@ -1,3 +1,6 @@
+require 'rubygems'
+require_relative "google_file_upload"
+include GoogleFileUpload
 notes_file = File.open("clippings.txt")
 begin
   line_fl = File.open("line_file")
@@ -31,4 +34,7 @@ notes_array.each do |note|
 end
 
 File.open("notes.json", "w") { |f| f.write(books_array) }
+
+file_insert({'title'=>"Notes JSON", "desctiption"=>"Json of kindle notes", "mimeType"=>"application/json"}, 'notes.json', 'application/json')
 notes_file.close
+
