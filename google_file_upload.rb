@@ -14,9 +14,32 @@ module GoogleFileUpload
 
 	def file_insert(file_schema, file_path, file_type)
 
-		# Create a new API client & load the Google Drive API
-		client = Google::APIClient.new({:application_name=>KEYS["google"]["application_name"], :applicatiion_version=>"1.0"})
+
+		client = authorize
 		drive = client.discovered_api('drive', 'v2')
+		# Insert a file
+		file = drive.files.insert.request_schema.new(file_schema)
+
+		media = Google::APIClient::UploadIO.new(file_path, file_type)
+		result = client.execute(
+		  :api_method => drive.files.insert,
+		  :body_object => file,
+		  :media => media,
+		  :parameters => {
+		    'uploadType' => 'multipart',
+		    'alt' => 'json'})
+
+		# Pretty print the API result
+		return result.data.to_hash
+	end
+
+	def file_find(file_id)
+		client = authorize
+
+	end
+
+	def authorize
+		client = Google::APIClient.new({:application_name=>KEYS["google"]["application_name"], :applicatiion_version=>"1.0"})
 
 		# Request authorization
 		client.authorization.client_id = CLIENT_ID
@@ -32,21 +55,7 @@ module GoogleFileUpload
 		$stdout.write  "Enter authorization code: "
 		client.authorization.code = gets.chomp #KEYS["google"]["auth_code"]
 		client.authorization.fetch_access_token!
-
-		# Insert a file
-		file = drive.files.insert.request_schema.new(file_schema)
-
-		media = Google::APIClient::UploadIO.new(file_path, file_type)
-		result = client.execute(
-		  :api_method => drive.files.insert,
-		  :body_object => file,
-		  :media => media,
-		  :parameters => {
-		    'uploadType' => 'multipart',
-		    'alt' => 'json'})
-
-		# Pretty print the API result
-		puts result.data.to_hash
+		return client
 	end
 end
 

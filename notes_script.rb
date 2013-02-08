@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'prawn'
 require_relative "google_file_upload"
 include GoogleFileUpload
 notes_file = File.open("clippings.txt")
@@ -35,6 +36,15 @@ end
 
 File.open("notes.json", "w") { |f| f.write(books_array) }
 
-file_insert({'title'=>"Notes JSON", "desctiption"=>"Json of kindle notes", "mimeType"=>"application/json"}, 'notes.json', 'application/json')
+result = {}
+result["notes_json_result"] = file_insert({'title'=>"Notes JSON", "desctiption"=>"Json of kindle notes", "mimeType"=>"application/json"}, 'notes.json', 'application/json')
+
+File.open("results.yml", 'w+') { |f| f.write(result.to_yaml) }
+
+notes_result_file = File.open("results.doc", 'w+')
+
+books_array.each do |book|
+	notes_result_file.write(books)
+end
 notes_file.close
 
