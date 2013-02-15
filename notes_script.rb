@@ -37,14 +37,28 @@ end
 File.open("notes.json", "w") { |f| f.write(books_array) }
 
 result = {}
-result["notes_json_result"] = file_insert({'title'=>"Notes JSON", "desctiption"=>"Json of kindle notes", "mimeType"=>"application/json"}, 'notes.json', 'application/json')
+# result["notes_json_result"] = file_insert({'title'=>"Notes JSON", "desctiption"=>"Json of kindle notes", "mimeType"=>"application/json"}, 'notes.json', 'application/json')
 
 File.open("results.yml", 'w+') { |f| f.write(result.to_yaml) }
 
-notes_result_file = File.open("results.doc", 'w+')
+pdf = Prawn::Document.new
 
+pdf.text "Notes and highlights from Books", align: :center, size: 16
 books_array.each do |book|
-	notes_result_file.write(books)
+	# notes_result_file.write(books)
+	pdf.text book["name"], align: :center, size: 14
+	pdf.text book["author"], align: :center, styles: :italic
+	book_notes = book["notes"].map { |n| n["text"] }
+	pdf.text book_notes.join("\n\n")
+	pdf.start_new_page
 end
+
+pdf.render_file("notes.pdf")
+
+result["notes_pdf_result"] = file_insert({'title'=>"Kindle Notes", "desctiption"=>"kindle notes", "mimeType"=>"application/pdf"}, 'notes.pdf', 'application/pdf')
+
+File.open("results.yml", 'w+') { |f| f.write(result.to_yaml) }
+
+
 notes_file.close
 
